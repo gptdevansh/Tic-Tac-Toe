@@ -3,8 +3,8 @@
 
 #include<iostream>
 #include<vector>
-#ifndef TIC-TAC-TOE_H
-#define TIC-TAC-TOE_H
+#ifndef TIC_TAC_TOE_H
+#define TIC_TAC_TOE_H
 
 class TicTacToe {
 private:
