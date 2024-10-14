@@ -1,50 +1,86 @@
 // Header for Game logic
-// tic_tac_toe.h
+// tic-tac-toe.h
 
 #include<iostream>
 #include<vector>
-#ifndef TIC_TAC_TOE_H
-#define TIC_TAC_TOE_H
+#ifndef TIC-TAC-TOE_H
+#define TIC-TAC-TOE_H
 
-// Initialize Board
-void initialize_board(std::vector<char> &board){
-    board = {'1', '2', '3', '4', '5', '6', '7', '8', '9'};
-}
+class TicTacToe {
+private:
+    // 2D vector to represent the game board
+    std::vector<std::vector<char>> board;
+    char currentPlayer; // Tracks the current player ('X' or 'O')
 
-// Display Board
-void display_board(const std::vector<char>& board){
-    std::cout<<" "<<board[0]<<" | "<<board[1]<<" | "<<board[2]<<std::endl;
-    std::cout<<"---|---|---"<<std::endl;
-    std::cout<<" "<<board[3]<<" | "<<board[4]<<" | "<<board[5]<<std::endl;
-    std::cout<<"---|---|---"<<std::endl;
-    std::cout<<" "<<board[6]<<" | "<<board[7]<<" | "<<board[8]<<std::endl;
-}
+public:
+    // Constructor to initialize the game
+    TicTacToe() {
+        board = std::vector<std::vector<char>>(3, std::vector<char>(3, ' ')); // Initialize the board with spaces
+        currentPlayer = 'X'; // Set the starting player to 'X'
+    }
 
-// Check For win
-bool check_win(const std::vector<char> &board, char player){
-    // win condition
-    const int win_conditions[8][3] = {
-        {0,1,2}, {3, 4, 5}, {6, 7, 8}, {0, 3, 6}, {1, 4, 7}, {2, 5, 8}, {0, 4, 8}, {2, 4, 6}    
-        };
-
-    for(const auto &condition : win_conditions){
-        if(board[condition[0]] == player && 
-           board[condition[1]] == player &&
-           board[condition[2]] == player){
-            return true;
-        }
-    }   
-    return false; 
-}
-
-// Check for draw
-bool check_draw(const std::vector<char> &board){
-    for(char cell : board){
-        if(cell != 'X' && cell != '0'){
-            return false;
+    // Function to display the current state of the board
+    void displayBoard() {
+        std::cout << "Current Board:\n";
+        for (const auto& row : board) {
+            for (const auto& cell : row) {
+                std::cout << cell << '|'; // Print each cell followed by a '|'
+            }
+            std::cout << "\n-----\n"; // Separator for rows
         }
     }
-    return true;
-}
 
+    // Function to place a mark on the board
+    bool placeMark(int row, int col) {
+        // Check if the move is valid
+        if (row < 0 || row >= 3 || col < 0 || col >= 3 || board[row][col] != ' ') {
+            std::cout << "Invalid move. Try again.\n";
+            return false; // Invalid move
+        }
+        board[row][col] = currentPlayer; // Place the current player's mark
+        return true; // Move successful
+    }
+
+    // Function to check if the current player has won
+    bool checkWin() {
+        // Check all rows and columns for a win
+        for (int i = 0; i < 3; ++i) {
+            if ((board[i][0] == currentPlayer && board[i][1] == currentPlayer && board[i][2] == currentPlayer) ||
+                (board[0][i] == currentPlayer && board[1][i] == currentPlayer && board[2][i] == currentPlayer)) {
+                return true; // Winning condition met
+            }
+        }
+        // Check both diagonals for a win
+        if ((board[0][0] == currentPlayer && board[1][1] == currentPlayer && board[2][2] == currentPlayer) ||
+            (board[0][2] == currentPlayer && board[1][1] == currentPlayer && board[2][0] == currentPlayer)) {
+            return true; // Winning condition met
+        }
+        return false; // No win
+    }
+
+    // Function to switch players
+    void switchPlayer() {
+        currentPlayer = (currentPlayer == 'X') ? 'O' : 'X'; // Alternate between 'X' and 'O'
+    }
+
+    // Main game loop
+    void playGame() {
+        int row, col; // Variables to hold the player's input
+        for (int turns = 0; turns < 9; ++turns) { // Allow up to 9 turns (maximum moves)
+            displayBoard(); // Display the current board
+            std::cout << "Player " << currentPlayer << ", enter your move (row and column): ";
+            std::cin >> row >> col; // Get input from the player
+            if (placeMark(row, col)) { // Attempt to place the mark
+                if (checkWin()) { // Check for a win
+                    displayBoard(); // Show final board
+                    std::cout << "Player " << currentPlayer << " wins!\n"; // Announce winner
+                    return; // End game
+                }
+                switchPlayer(); // Switch to the other player
+            }
+        }
+        displayBoard(); // Show final board if no winner
+        std::cout << "It's a draw!\n"; // Announce draw
+    }
+};
 #endif 
